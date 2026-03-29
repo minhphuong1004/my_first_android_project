@@ -27,7 +27,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " address TEXT," +
                 "avatarURL TEXT," +
                 "description TEXT)";
+
+        String createPostTable = "CREATE TABLE posts (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "user_email TEXT, " +
+                "content TEXT, " +
+                "date TEXT)";
         db.execSQL(createTable);
+        db.execSQL(createPostTable);
     }
 
     @Override
