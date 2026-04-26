@@ -6,6 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.myapplication.model.Post;
+
+import java.util.ArrayList;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "UserDB";
@@ -24,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "name TEXT, " +
                 "email TEXT UNIQUE, " +
                 "password TEXT," +
-                " address TEXT," +
+                "address TEXT," +
                 "avatarURL TEXT," +
                 "description TEXT)";
 
@@ -87,6 +91,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return "";
     }
+    public String getAvatar(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT avatarURL FROM users WHERE email = ?",
+                new String[]{email}
+        );
+
+        if (cursor.moveToFirst()) {
+            String avatar = cursor.getString(0);
+            cursor.close();
+            return avatar;
+        }
+
+        cursor.close();
+        return null;
+    }
 
     public boolean updateUser(String email, String name, String address, String avatarURL, String description) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -98,5 +119,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("description", description);
         int result = db.update("users", values, "email=?", new String[]{email});
         return result > 0;
+    }
+
+    public void insertPost(String email, String content, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("user_email", email);
+        values.put("content", content);
+        values.put("date", date);
+
+        db.insert("posts", null, values);
+    }
+    public ArrayList<Post> getPosts(String email) {
+        ArrayList<Post> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT content, date FROM posts WHERE user_email=?",
+                new String[]{email}
+        );
+
+        while (cursor.moveToNext()) {
+            String content = cursor.getString(0);
+            String date = cursor.getString(1);
+            list.add(new Post("You", content, date));
+        }
+
+        cursor.close();
+        return list;
     }
 }

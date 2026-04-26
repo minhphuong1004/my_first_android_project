@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.myapplication.R;
 import com.example.myapplication.database.DatabaseHelper;
+import com.example.myapplication.model.Post;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -46,14 +47,17 @@ public class LoginActivity extends AppCompatActivity {
 
              boolean isValid = dbHelper.checkUser(email, password);
              if (isValid) {
-                 Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                 String name = dbHelper.getName(email);
+                 Intent intent = new Intent(LoginActivity.this, PostActivity.class);
                  intent.putExtra("email", email);
+                 intent.putExtra("name",name);
                  startActivity(intent);
              } else {
                  Toast.makeText(this, "Wrong information", Toast.LENGTH_SHORT).show();
              }
 
          });
+
 
     }
 }

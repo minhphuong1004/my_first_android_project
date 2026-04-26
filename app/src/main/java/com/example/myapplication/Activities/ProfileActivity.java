@@ -9,14 +9,21 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.myapplication.R;
 import com.example.myapplication.database.DatabaseHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.bumptech.glide.Glide;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 
 public class ProfileActivity extends AppCompatActivity {
@@ -41,16 +48,19 @@ public class ProfileActivity extends AppCompatActivity {
         edtAvatarURL = findViewById(R.id.edtAvatarURL);
         edtDescription = findViewById(R.id.edtDescription);
         imgAvatar = findViewById(R.id.imgAvatar);
-        Glide.with(this)
-                .load(R.drawable.default_avatar)
-                .transform(new RoundedCorners(30))
-                .into(imgAvatar);
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         email = getIntent().getStringExtra("email");
         if (email != null) {
             String name = dbHelper.getName(email);
+            String avatar = dbHelper.getAvatar(email);
             edtName.setText(name);
             txtName.setText(name + "!");
+            Glide.with(this)
+                    .load(avatar != null && !avatar.isEmpty()
+                            ? avatar
+                            : R.drawable.default_avatar)
+                    .transform(new RoundedCorners(30))
+                    .into(imgAvatar);
         }
         btnSave = findViewById(R.id.btnSave);
         btnLogout = findViewById(R.id.btnLogout);
@@ -67,6 +77,11 @@ public class ProfileActivity extends AppCompatActivity {
             if (success) {
                 txtName.setText(name + "!");
                 Toast.makeText(this, "Save successfully", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ProfileActivity.this, PostActivity.class);
+                intent.putExtra("email", email);
+                intent.putExtra("name",name);
+                intent.putExtra("avatar",avatar);
+                startActivity(intent);
             } else {
                 Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
             }
@@ -108,9 +123,27 @@ public class ProfileActivity extends AppCompatActivity {
 
                     Glide.with(ProfileActivity.this)
                             .load(url.isEmpty() ? R.drawable.default_avatar : url)
+                            .skipMemoryCache(true)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .placeholder(R.drawable.default_avatar)
                             .error(R.drawable.default_avatar)
                             .transform(new RoundedCorners(30))
+                            .listener(new RequestListener<Drawable>() {
+                                @Override
+                                public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                                                            Target<Drawable> target, boolean isFirstResource) {
+                                    Log.e("GLIDE", "Load failed: " + url);
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(Drawable resource, Object model,
+                                                               Target<Drawable> target, DataSource dataSource,
+                                                               boolean isFirstResource) {
+                                    Log.d("GLIDE", "Load success");
+                                    return false;
+                                }
+                            })
                             .into(imgAvatar);
                 };
 
@@ -125,5 +158,20 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        String avatar = dbHelper.getAvatar(email);
+
+        Glide.with(this)
+                .load(avatar != null && !avatar.isEmpty()
+                        ? avatar
+                        : R.drawable.default_avatar)
+                .transform(new RoundedCorners(30))
+                .into(imgAvatar);
     }
 }
