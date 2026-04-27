@@ -3,6 +3,7 @@ package com.example.myapplication.Activities;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import android.content.Intent;
@@ -78,7 +79,7 @@ public class PostActivity extends AppCompatActivity {
             db.insertPost(email, content, date);
 
             //add UI
-            postList.add(0, new Post(name, content, date));
+            postList.add(0, new Post(email, content, date));
             adapter.notifyDataSetChanged();
 
             edtPost.setText("");
@@ -116,10 +117,11 @@ public class PostActivity extends AppCompatActivity {
         else if (id == R.id.action_sort_date) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             Collections.sort(postList, (p1, p2) -> {
+                if (p1.date == null || p2.date == null) return 0;
                 try {
                     Date d1 = sdf.parse(p1.date);
                     Date d2 = sdf.parse(p2.date);
-                    return d2.compareTo(d1); // mới nhất lên đầu
+                    return d2.compareTo(d1);
                 } catch (Exception e) {
                     return 0;
                 }
@@ -128,8 +130,14 @@ public class PostActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_sort_name) {
+            DatabaseHelper db = new DatabaseHelper(this);
+            HashMap<String, String> nameCache = new HashMap<>(); // tranh goi DB nhieu lan
+            for (Post p : postList) {
+                if (!nameCache.containsKey(p.email))
+                    nameCache.put(p.email, db.getName(p.email));
+            }
             Collections.sort(postList, (p1, p2) ->
-                    p1.title.compareToIgnoreCase(p2.title));
+                    nameCache.get(p1.email).compareToIgnoreCase(nameCache.get(p2.email)));
             adapter.notifyDataSetChanged();
             return true;
         }

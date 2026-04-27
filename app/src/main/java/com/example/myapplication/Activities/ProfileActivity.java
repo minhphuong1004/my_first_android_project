@@ -1,6 +1,7 @@
 package com.example.myapplication.Activities;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -27,6 +28,7 @@ import com.bumptech.glide.request.target.Target;
 
 
 public class ProfileActivity extends AppCompatActivity {
+    DatabaseHelper dbHelper;
     TextView txtName;
     TextInputEditText edtName,edtEmail, edtAddress, edtAvatarURL, edtDescription;
     String email;
@@ -48,19 +50,35 @@ public class ProfileActivity extends AppCompatActivity {
         edtAvatarURL = findViewById(R.id.edtAvatarURL);
         edtDescription = findViewById(R.id.edtDescription);
         imgAvatar = findViewById(R.id.imgAvatar);
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper = new DatabaseHelper(this);
         email = getIntent().getStringExtra("email");
         if (email != null) {
-            String name = dbHelper.getName(email);
-            String avatar = dbHelper.getAvatar(email);
-            edtName.setText(name);
-            txtName.setText(name + "!");
-            Glide.with(this)
-                    .load(avatar != null && !avatar.isEmpty()
-                            ? avatar
-                            : R.drawable.default_avatar)
-                    .transform(new RoundedCorners(30))
-                    .into(imgAvatar);
+            Cursor c = dbHelper.getUser(email);
+
+            if (c.moveToFirst()) {
+                String name = c.getString(1);
+                String emailVal = c.getString(2);
+                String address = c.getString(4);
+                String avatar = c.getString(5);
+                String description = c.getString(6);
+
+                edtName.setText(name);
+                edtEmail.setText(emailVal);
+                edtAddress.setText(address);
+                edtAvatarURL.setText(avatar);
+                edtDescription.setText(description);
+
+                txtName.setText(name + "!");
+
+                Glide.with(this)
+                        .load(avatar != null && !avatar.isEmpty()
+                                ? avatar
+                                : R.drawable.default_avatar)
+                        .transform(new RoundedCorners(30))
+                        .into(imgAvatar);
+            }
+
+            c.close();
         }
         btnSave = findViewById(R.id.btnSave);
         btnLogout = findViewById(R.id.btnLogout);
@@ -71,6 +89,9 @@ public class ProfileActivity extends AppCompatActivity {
             String address = edtAddress.getText().toString().trim();
             String avatar = edtAvatarURL.getText().toString().trim();
             String description = edtDescription.getText().toString().trim();
+
+            if (avatar.isEmpty())
+                avatar = dbHelper.getAvatar(email);
 
             boolean success = dbHelper.updateUser(email, name, address, avatar, description);
 

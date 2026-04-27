@@ -1,12 +1,12 @@
 package com.example.myapplication.model;
 
 public class Post {
-    public String title;
+    public String email;
     public String content;
     public  String date;
 
-    public Post(String title, String content, String date) {
-        this.title = title;
+    public Post(String email, String content, String date) {
+        this.email = email;
         this.content = content;
         this.date = date;
     }

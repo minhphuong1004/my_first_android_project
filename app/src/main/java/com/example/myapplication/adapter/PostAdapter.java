@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
+import com.example.myapplication.database.DatabaseHelper;
 import com.example.myapplication.model.Post;
 
 import java.util.ArrayList;
@@ -74,12 +75,16 @@ public class PostAdapter extends BaseAdapter {
 
         // get data
         Post post = list.get(position);
-        holder.txtTitle.setText(post.title);
+        DatabaseHelper db = new DatabaseHelper(context);
+        String name = db.getName(post.email);
+        String avatar = db.getAvatar(post.email);
+
+        holder.txtTitle.setText(name);
         holder.txtContent.setText(post.content);
         holder.txtDate.setText(post.date);
         Glide.with(context)
-                .load(avatarUrl != null && !avatarUrl.isEmpty()
-                        ? avatarUrl
+                .load(avatar != null && !avatar.isEmpty()
+                        ? avatar
                         : R.drawable.default_avatar)
                 .circleCrop()
                 .into(holder.imgAvatar);
