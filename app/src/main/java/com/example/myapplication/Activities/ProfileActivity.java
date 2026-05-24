@@ -30,7 +30,7 @@ import com.bumptech.glide.request.target.Target;
 public class ProfileActivity extends AppCompatActivity {
     DatabaseHelper dbHelper;
     TextView txtName;
-    TextInputEditText edtName,edtEmail, edtAddress, edtAvatarURL, edtDescription;
+    TextInputEditText edtName,edtEmail, edtPhoneNumber, edtAddress, edtAvatarURL, edtDescription;
     String email;
     Button btnSave, btnLogout;
     ImageView imgAvatar;
@@ -46,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         edtName = findViewById(R.id.edtName);
         edtEmail = findViewById(R.id.edtEmail);
+        edtPhoneNumber = findViewById(R.id.edtPhoneNumber);
         edtAddress = findViewById(R.id.edtAddress);
         edtAvatarURL = findViewById(R.id.edtAvatarURL);
         edtDescription = findViewById(R.id.edtDescription);
@@ -58,12 +59,14 @@ public class ProfileActivity extends AppCompatActivity {
             if (c.moveToFirst()) {
                 String name = c.getString(1);
                 String emailVal = c.getString(2);
-                String address = c.getString(4);
-                String avatar = c.getString(5);
-                String description = c.getString(6);
+                String phoneNumber = c.getString(4);
+                String address = c.getString(5);
+                String avatar = c.getString(6);
+                String description = c.getString(7);
 
                 edtName.setText(name);
                 edtEmail.setText(emailVal);
+                edtPhoneNumber.setText(phoneNumber);
                 edtAddress.setText(address);
                 edtAvatarURL.setText(avatar);
                 edtDescription.setText(description);
@@ -87,13 +90,14 @@ public class ProfileActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> {
             String name = edtName.getText().toString().trim();
             String address = edtAddress.getText().toString().trim();
+            String phoneNumber = edtPhoneNumber.getText().toString().trim();
             String avatar = edtAvatarURL.getText().toString().trim();
             String description = edtDescription.getText().toString().trim();
 
             if (avatar.isEmpty())
                 avatar = dbHelper.getAvatar(email);
 
-            boolean success = dbHelper.updateUser(email, name, address, avatar, description);
+            boolean success = dbHelper.updateUser(email, name, phoneNumber, address, avatar, description);
 
             if (success) {
                 txtName.setText(name + "!");

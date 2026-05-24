@@ -5,6 +5,18 @@
         android:title="Profile"/>
 
     <item
+        android:id="@+id/friend_list"
+        android:title="Friends"/>
+
+    <item
+        android:id="@+id/friend_requests"
+        android:title="Friend requests"/>
+
+    <item
+        android:id="@+id/friend_suggestion"
+        android:title="Friend suggestions"/>
+
+    <item
         android:id="@+id/action_sort_date"
         android:title="Sort by Date"/>
 

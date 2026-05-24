@@ -70,16 +70,16 @@ public class PostActivity extends AppCompatActivity {
 
             if (content.isEmpty()) return;
 
-            String date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            String datetime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
                     .format(new Date());
 
             String name = (userName != null) ?userName : "You";
 
             //luu DB
-            db.insertPost(email, content, date);
+            db.insertPost(email, content);
 
             //add UI
-            postList.add(0, new Post(email, content, date));
+            postList.add(0, new Post(email, content, datetime));
             adapter.notifyDataSetChanged();
 
             edtPost.setText("");
@@ -93,8 +93,9 @@ public class PostActivity extends AppCompatActivity {
         DatabaseHelper db = new DatabaseHelper(this);
         avatarUrl = db.getAvatar(email);
 
-        adapter = new PostAdapter(this, postList, avatarUrl);
-        listView.setAdapter(adapter);
+        adapter.clearCache();
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -114,8 +115,27 @@ public class PostActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         }
+        else if (id == R.id.friend_list) {
+            Intent intent = new Intent(PostActivity.this, FriendActivity.class);
+            intent.putExtra("email", getIntent().getStringExtra("email"));
+            startActivity(intent);
+            return true;
+        }
+        else if (id == R.id.friend_requests) {
+            Intent intent = new Intent(PostActivity.this, FriendRequestActivity.class);
+            intent.putExtra("email", getIntent().getStringExtra("email"));
+            startActivity(intent);
+            return true;
+        }
+        else if (id == R.id.friend_suggestion) {
+            Intent intent = new Intent(PostActivity.this, FriendSuggestionActivity.class);
+            intent.putExtra("email", getIntent().getStringExtra("email"));
+            startActivity(intent);
+            return true;
+        }
         else if (id == R.id.action_sort_date) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+
             Collections.sort(postList, (p1, p2) -> {
                 if (p1.date == null || p2.date == null) return 0;
                 try {
@@ -144,6 +164,7 @@ public class PostActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {

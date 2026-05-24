@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -25,6 +26,9 @@
         <activity android:name=".Activities.RegisterActivity"/>
         <activity android:name=".Activities.ProfileActivity"/>
         <activity android:name=".Activities.PostActivity"/>
+        <activity android:name=".Activities.FriendActivity"/>
+        <activity android:name=".Activities.FriendRequestActivity"/>
+        <activity android:name=".Activities.FriendSuggestionActivity"/>
 
 
 
@@ -32,6 +36,6 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
     </application>
-`
+
 
 </manifest>

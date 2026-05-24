@@ -14,6 +14,7 @@ import com.example.myapplication.database.DatabaseHelper;
 import com.example.myapplication.model.Post;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PostAdapter extends BaseAdapter {
 
@@ -21,11 +22,22 @@ public class PostAdapter extends BaseAdapter {
     ArrayList<Post> list;
     String avatarUrl;
 
+    HashMap<String, String> nameCache = new HashMap<>();
+    HashMap<String, String> avatarCache = new HashMap<>();
+    DatabaseHelper db;
+
     // Constructor
     public PostAdapter(Context context, ArrayList<Post> list, String avatarUrl) {
         this.context = context;
         this.list = list;
         this.avatarUrl = avatarUrl;
+
+        db = new DatabaseHelper(context);
+    }
+
+    public void clearCache() {
+        nameCache.clear();
+        avatarCache.clear();
     }
 
     // count item
@@ -75,9 +87,23 @@ public class PostAdapter extends BaseAdapter {
 
         // get data
         Post post = list.get(position);
-        DatabaseHelper db = new DatabaseHelper(context);
-        String name = db.getName(post.email);
-        String avatar = db.getAvatar(post.email);
+        String name;
+        //cache name
+        if (nameCache.containsKey(post.email))
+            name = nameCache.get(post.email);
+        else {
+            name = db.getName(post.email);
+            nameCache.put(post.email, name);
+        }
+
+        String avatar;
+        //cache avatar
+        if (avatarCache.containsKey(post.email))
+            avatar = avatarCache.get(post.email);
+        else {
+            avatar = db.getAvatar(post.email);
+            avatarCache.put(post.email, avatar);
+        }
 
         holder.txtTitle.setText(name);
         holder.txtContent.setText(post.content);
@@ -91,4 +117,5 @@ public class PostAdapter extends BaseAdapter {
 
         return view;
     }
+
 }

@@ -17,9 +17,10 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
 
-        EditText edtName1, edtEmail1, edtPw1, confirmPw1;
+        EditText edtName1, edtEmail1, edtPw1, confirmPw1, edtPhoneNumber1;
         edtName1 = findViewById(R.id.edtName1);
         edtEmail1 = findViewById(R.id.edtEmail1);
+        edtPhoneNumber1 = findViewById(R.id.edtPhoneNumber1);
         edtPw1 = findViewById(R.id.edtPw1);
         confirmPw1 = findViewById(R.id.confirmPw1);
 
@@ -28,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnCreate.setOnClickListener(v -> {
             String name = edtName1.getText().toString();
             String email = edtEmail1.getText().toString();
+            String phoneNumber = edtPhoneNumber1.getText().toString();
             String password = edtPw1.getText().toString();
             String confirm = confirmPw1.getText().toString();
 
@@ -36,12 +38,12 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (name.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Cannot be left blank!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            boolean success = dbHelper.insertUser(name,email,password);
+            boolean success = dbHelper.insertUser(name,email,password,phoneNumber);
             if (success) {
                 Toast.makeText(this, "Register successfully", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
